@@ -1,0 +1,24 @@
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+  "content": "VSCode REST client",
+  "important": false
+}
+
+###
+
+GET http://localhost:3001/api/blogs/WRONGID
+
+###
+
+DELETE http://localhost:3001/api/blogs/61e080aea62393310443c875
+
+###
+
+PUT http://localhost:3001/api/blogs/61e07cb3bb14191e38d990d3
+Content-Type: application/json
+
+{
+  "important": true
+}

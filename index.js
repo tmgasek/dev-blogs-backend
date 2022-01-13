@@ -1,28 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-
-let blogs = [
-  {
-    id: 1,
-    content: 'HTML is easy',
-    date: '2019-05-30T17:30:31.098Z',
-    important: true,
-  },
-  {
-    id: 2,
-    content: 'Browser can execute only Javascript',
-    date: '2019-05-30T18:39:34.091Z',
-    important: false,
-  },
-  {
-    id: 3,
-    content: 'GET and POST are the most important methods of HTTP protocol',
-    date: '2019-05-30T19:20:14.298Z',
-    important: true,
-  },
-];
+const Blog = require('./models/blog');
 
 const app = express();
+app.use(cors());
 
 const requestLogger = (request, response, next) => {
   console.log('Method', request.method);
@@ -34,59 +16,66 @@ const requestLogger = (request, response, next) => {
 
 app.use(express.json());
 app.use(requestLogger);
-app.use(cors());
-
-const generateID = () => {
-  const maxId = blogs.length > 0 ? Math.max(...blogs.map((n) => n.id)) : 0;
-
-  return maxId;
-};
 
 app.get('/', (request, response) => {
-  response.send(`<h1>Hello World</h1`);
+  response.send('<h1>Hello World</h1');
 });
 
 app.get('/api/blogs', (request, response) => {
-  response.json(blogs);
+  Blog.find({}).then((blogs) => {
+    response.json(blogs);
+  });
 });
 
-app.get('/api/blogs/:id', (request, response) => {
-  const id = parseInt(request.params.id);
-  const blog = blogs.find((blog) => blog.id === id);
-
-  if (blogs) {
-    response.json(blog);
-  } else {
-    response.status(404).end();
-  }
+app.get('/api/blogs/:id', (request, response, next) => {
+  Blog.findById(request.params.id)
+    .then((blog) => {
+      if (blog) {
+        response.json(blog);
+      } else {
+        response.status(404).end();
+      }
+    })
+    .catch((error) => next(error));
 });
 
-app.delete('/api/blogs/:id', (request, response) => {
-  const id = parseInt(request.params.id);
-  blogs = blogs.filter((blog) => blog.id !== id);
-
-  response.status(204).end();
+app.delete('/api/blogs/:id', (request, response, next) => {
+  Blog.findByIdAndDelete(request.params.id)
+    .then(() => {
+      response.status(204).end();
+    })
+    .catch((error) => next(error));
 });
 
 app.post('/api/blogs', (request, response) => {
   const body = request.body;
 
-  if (!body.content) {
-    return response.status(400).json({
-      error: 'content missing',
-    });
+  if (body.content === undefined) {
+    return response.status(400).json({ error: 'content missing' });
   }
 
-  const blog = {
+  const blog = new Blog({
     content: body.content,
     important: body.important || false,
     date: new Date(),
-    id: generateID(),
+  });
+
+  blog.save().then((savedblog) => {
+    response.json(savedblog);
+  });
+});
+
+app.put('/api/blogs/:id', (request, response, next) => {
+  const body = request.body;
+
+  const blog = {
+    content: body.content,
+    important: body.important,
   };
 
-  blogs = blogs.concat(blog);
-
-  response.json(blog);
+  Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+    .then((updatedBlog) => response.json(updatedBlog))
+    .catch((error) => next(error));
 });
 
 const unknownEndpoint = (request, response) => {
@@ -94,6 +83,17 @@ const unknownEndpoint = (request, response) => {
 };
 
 app.use(unknownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+  console.log(error.message);
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' });
+  }
+  next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = 3001;
 app.listen(PORT, () => {
