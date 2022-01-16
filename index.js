@@ -5,6 +5,7 @@ const Blog = require('./models/blog');
 
 const app = express();
 app.use(cors());
+app.use(express.static('build'));
 
 const requestLogger = (request, response, next) => {
   console.log('Method', request.method);
@@ -47,12 +48,8 @@ app.delete('/api/blogs/:id', (request, response, next) => {
     .catch((error) => next(error));
 });
 
-app.post('/api/blogs', (request, response) => {
+app.post('/api/blogs', (request, response, next) => {
   const body = request.body;
-
-  if (body.content === undefined) {
-    return response.status(400).json({ error: 'content missing' });
-  }
 
   const blog = new Blog({
     content: body.content,
@@ -60,9 +57,12 @@ app.post('/api/blogs', (request, response) => {
     date: new Date(),
   });
 
-  blog.save().then((savedblog) => {
-    response.json(savedblog);
-  });
+  blog
+    .save()
+    .then((savedblog) => {
+      response.json(savedblog);
+    })
+    .catch((error) => next(error));
 });
 
 app.put('/api/blogs/:id', (request, response, next) => {
@@ -89,13 +89,15 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' });
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).send({ error: error.message });
   }
   next(error);
 };
 
 app.use(errorHandler);
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`server running on port ${PORT}`);
 });
