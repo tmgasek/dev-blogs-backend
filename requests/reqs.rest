@@ -19,12 +19,12 @@ Content-Type: application/json
 
 POST http://localhost:3001/api/blogs
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3RVc2VyIiwiaWQiOiI2MWU1NzE1MmQ0YWE5Y2E4N2E4MGRiZDUiLCJpYXQiOjE2NDI0MzIzNzYsImV4cCI6MTY0MjQzNTk3Nn0._I78ace199sV5QcsigaOrty14GLJsgMAL4AhNobGMJA
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3RVc2VyIiwiaWQiOiI2MWU1NzE1MmQ0YWE5Y2E4N2E4MGRiZDUiLCJpYXQiOjE2NDI0NTg0MTksImV4cCI6MTY0MjQ2MjAxOX0.GDdTJA1siqr0osqMObjrNusKh7ymRo6C0N2QALGGLok
 
 {
-  "title": "NEWTESTdddd",
-  "url": "hello.com2256",
-  "author": "authorname22456"
+  "title": "hellothere",
+  "url": "randomurl",
+  "author": "yes"
 }
 
 ###
