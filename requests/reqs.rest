@@ -1,9 +1,31 @@
+GET http://localhost:3001/api/blogs
+
+###
+
+GET http://localhost:3001/api/users
+
+###
+
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+  "username": "rootUser2",
+  "name": "root2",
+  "password": "admin",
+  "blogs": []
+}
+
+###
+
 POST http://localhost:3001/api/blogs
 Content-Type: application/json
 
 {
-  "content": "ff",
-  "important": false
+  "title": "test56",
+  "url": "hello.com2256",
+  "author": "authorname22456",
+  "userId": "61e57152d4aa9ca87a80dbd5"
 }
 
 ###
@@ -16,9 +38,11 @@ DELETE http://localhost:3001/api/blogs/61e080aea62393310443c875
 
 ###
 
-PUT http://localhost:3001/api/blogs/61e07cb3bb14191e38d990d3
+POST http://localhost:3001/api/login
 Content-Type: application/json
 
 {
-  "important": true
+  "username": "rootUser",
+  "password": "admin"
 }
+ 
