@@ -10,9 +10,19 @@ blogsRouter.get('/', async (request, response) => {
   response.json(blogs);
 });
 
-blogsRouter.get('/:id', async (request, response) => {
-  const blog = await Blog.findById(request.params.id).populate('user');
+// blogsRouter.get('/:id', async (request, response) => {
+//   const blog = await Blog.findById(request.params.id).populate('user');
 
+//   if (blog) {
+//     response.json(blog);
+//   } else {
+//     response.status(404).end();
+//   }
+// });
+
+blogsRouter.get('/:slug', async (request, response) => {
+  const blog = await Blog.findOne({ slug: request.params.slug });
+  console.log(blog);
   if (blog) {
     response.json(blog);
   } else {
