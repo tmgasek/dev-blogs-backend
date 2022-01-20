@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+const slug = require('mongoose-slug-generator');
+
+mongoose.plugin(slug);
 
 const blogSchema = new mongoose.Schema({
   title: {
@@ -16,6 +19,7 @@ const blogSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
+  slug: { type: String, slug: 'title', unique: true },
 });
 
 // Even though the _id property of Mongoose objects looks like a string, it is in fact an object. The toJSON method we defined transforms it into a string just to be safe. If we didn't make this change, it would cause more harm for us in the future once we start writing tests. We also don't want to return the mongo versioning field __v to the frontend.
