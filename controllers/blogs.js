@@ -10,19 +10,20 @@ blogsRouter.get('/', async (request, response) => {
   response.json(blogs);
 });
 
-// blogsRouter.get('/:id', async (request, response) => {
-//   const blog = await Blog.findById(request.params.id).populate('user');
+blogsRouter.get('/:id', async (request, response) => {
+  const blog = await Blog.findById(request.params.id).populate('user');
 
-//   if (blog) {
-//     response.json(blog);
-//   } else {
-//     response.status(404).end();
-//   }
-// });
+  if (blog) {
+    response.json(blog);
+  } else {
+    response.status(404).end();
+  }
+});
 
 blogsRouter.get('/:slug', async (request, response) => {
-  const blog = await Blog.findOne({ slug: request.params.slug });
-  console.log(blog);
+  const blog = await Blog.findOne({ slug: request.params.slug }).populate(
+    'user'
+  );
   if (blog) {
     response.json(blog);
   } else {
@@ -97,60 +98,16 @@ blogsRouter.delete('/:id', async (request, response) => {
 });
 
 blogsRouter.put('/:id', async (request, response) => {
-  const decodedToken = jwt.verify(request.token, process.env.SECRET);
-  if (!request.token || !decodedToken.id) {
-    return response.status(401).json({ error: 'token missing or invalid' });
-  }
-
-  const blog = await Blog.findById(request.params.id);
   const body = request.body;
 
-  if (blog.likes !== body.likes) {
-    const newBlog = {
-      title: body.title,
-      author: body.author,
-      url: body.url,
-      likes: body.likes,
-      comments: body.comments,
-      slug: body.slug,
-    };
+  const blog = {
+    likes: body.likes,
+  };
 
-    const updatedBlog = await Blog.findByIdAndUpdate(
-      request.params.id,
-      newBlog,
-      {
-        new: true,
-      }
-    );
+  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {
+    new: true,
+  });
 
-    response.json(updatedBlog);
-  } else {
-    const user = await User.findById(decodedToken.id);
-    if (blog.user.toString() !== user.id.toString()) {
-      return response
-        .status(401)
-        .json({ error: 'only the author can edit the blog' });
-    }
-
-    const newBlog = {
-      title: body.title,
-      author: body.author,
-      url: body.url,
-      likes: body.likes,
-      comments: body.comments,
-      slug: body.slug,
-    };
-
-    const updatedBlog = await Blog.findByIdAndUpdate(
-      request.params.id,
-      newBlog,
-      {
-        new: true,
-      }
-    );
-
-    response.json(updatedBlog);
-  }
+  response.json(updatedBlog);
 });
-
 module.exports = blogsRouter;
