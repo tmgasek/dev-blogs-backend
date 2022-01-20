@@ -8,6 +8,7 @@ const blogsRouter = require('./controllers/blogs');
 const usersRouter = require('./controllers/users');
 const loginRouter = require('./controllers/login');
 const mongoose = require('mongoose');
+const path = require('path');
 
 const app = express();
 
@@ -41,7 +42,14 @@ if (process.env.NODE_ENV === 'test') {
   app.use('/api/testing', testingRouter);
 }
 
-app.use(middleware.unknownEndpoint);
+app.get('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build/index.html'), function (err) {
+    if (err) {
+      res.status(500).send(err);
+    }
+  });
+});
+
 app.use(middleware.errorHandler);
 
 module.exports = app;
