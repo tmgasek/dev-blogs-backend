@@ -14,7 +14,6 @@ blogsRouter.get('/:id', async (request, response) => {
   console.log(request.params.id);
   const blog = await Blog.findById(request.params.id).populate('user');
 
-  console.log(blog);
   if (blog) {
     response.json(blog);
   } else {
@@ -42,6 +41,10 @@ blogsRouter.post('/', async (request, response) => {
 
   if (!blog.comments) {
     blog.comments = [];
+  }
+
+  if (!blog.description) {
+    blog.description = '';
   }
 
   blog.user = user;
@@ -77,7 +80,7 @@ blogsRouter.delete('/:id', async (request, response) => {
   if (blog.user.toString() !== user.id.toString()) {
     return response
       .status(401)
-      .json({ error: 'only the author can delete blog' });
+      .json({ error: 'Only the blog creator can delete a blog' });
   }
 
   await blog.remove();
