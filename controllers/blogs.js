@@ -59,7 +59,7 @@ blogsRouter.post('/', async (request, response) => {
 blogsRouter.post('/:id/comments', async (request, response) => {
   const newComment = request.body.comment;
 
-  const blog = await Blog.findById(request.params.id);
+  const blog = await Blog.findById(request.params.id).populate('user');
 
   blog.comments = blog.comments.concat(newComment);
 
